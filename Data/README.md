@@ -1,0 +1,1 @@
+This folder holds the CDD, BCP and SICP feature sets generated in the Feature_sets_extraction phase
