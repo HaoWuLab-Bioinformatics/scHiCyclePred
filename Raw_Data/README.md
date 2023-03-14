@@ -1,5 +1,8 @@
 # This folder contains the raw data used in this study
-### The original dataset used in this study can be directly downloaded from https://pan.baidu.com/s/1STtko6_6nRC36Whdh3jwuA ，and the extraction code is 0314.
+### The original dataset used in this study can be downloaded in the following two ways：
+
+1. If your IP address is from China, you can download the raw data by visiting https://pan.baidu.com/s/1STtko6_6nRC36Whdh3jwuA , and the extraction code is 0314.
+2. Otherwise, you can download the raw data by visiting https://drive.google.com/file/d/1WFe5UrvuLeIY7eFukbSHWXpS2pXSyu7R/view?usp=share_link.
 
 ### Introduction of the dataset：
 
