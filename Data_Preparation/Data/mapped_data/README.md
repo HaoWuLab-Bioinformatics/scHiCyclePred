@@ -1,0 +1,1 @@
+This folder contains data that has been processed by fend_map_coord.py
