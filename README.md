@@ -7,7 +7,7 @@ A deep learning framework for predicting cell cycles from single-cell Hi-C data 
 ## Framework
 The general framework of scHiCyclePred is as follows：
 <img src="General_framework.jpg"  />  
-The networkframework of scHiCyclePred is as follows：
+The framework of scHiCyclePred is as follows：
 <img src="Network_framework.jpg"  />  
 
 
