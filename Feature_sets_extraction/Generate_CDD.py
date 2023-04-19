@@ -44,7 +44,7 @@ file = '../Data/CDD.xlsx'
 workbook = xlsxwriter.Workbook(file)
 worksheet1 = workbook.add_worksheet('result')
 worksheet1.write(0, 0, 'cell_name')
-for i in range(1, 140):
+for i in range(1, 99):
     s = "bin_%s" % str(i+34)
     worksheet1.write(0, i, s)
 types = ['1CDES','1CDU','1CDX1','1CDX2','1CDX3','1CDX4']
