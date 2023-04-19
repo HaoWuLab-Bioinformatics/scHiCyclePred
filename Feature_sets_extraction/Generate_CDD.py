@@ -24,7 +24,7 @@ def read_pair(path):
 def Excel_to_Txt(input_path, output_path):
     df = pd.read_excel(input_path, header=None)
     print('开始写入txt文件')
-    df.to_csv(output_path, header=None, sep=',', index=False, na_rep=0)  # sep指定分隔符，分隔单元格
+    df.to_csv(output_path, header=None, sep='\t', index=False, na_rep=0)  # sep指定分隔符，分隔单元格
     print('写入成功')
 
 # Create TXT file with same path and same name
