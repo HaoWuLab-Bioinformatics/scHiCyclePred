@@ -30,24 +30,22 @@ def try_gpu(i=0):  #@save
         return torch.device(f'cuda:{i}')
     return torch.device('cpu')
 
-# 读取BCP特征集
 def load_BCP_dict():
-    file_path = "../../Data/Bin_contact_strength/Full_chr/Multi_channel/Nor/Bin_contact_strength(chr).npy"
+    file_path = "../../Data/BCP/Full_chr/Multi_channel/Nor/Bin_contact_strength(chr).npy"
     Data = np.load(file_path, allow_pickle=True).item()
     return Data
 
-# 读取CDP特征集
 def load_CDP_dict():
-    CDP_file = "../../Data/MyCDD/CDD.txt"
-    Data = pd.read_table(CDP_file, sep='\t', header='infer', names=None, index_col=None, dtype=None, engine=None,nrows=None)
+    CDP_file = "../../Data/CDD/CDD.txt"
+    Data = pd.read_table(CDP_file, sep='\t', header='infer', names=None, index_col=None, dtype=None, engine=None,
+                         nrows=None)
     return Data
 
-# 读取SBCP特征集
 def load_SBCP_dict():
-    file_path = '../../Data/Small_Domain_Struct_Contact_pro/Small_Domain_Struct_Contact_pro_scale(up_tran)(1).npy'
+    file_path = '../../Data/SICP/Small_Domain_Struct_Contact_pro_scale(up_tran)(1).npy'
     Data = np.load(file_path, allow_pickle=True).item()
-    return Data
 
+    return Data
 
 def load_BCP_data(BCP, idX, Y):
     # generate_bin()函数用于返回一个字典，字典中存的是每条染色体能够切出的块的数目，形如：
