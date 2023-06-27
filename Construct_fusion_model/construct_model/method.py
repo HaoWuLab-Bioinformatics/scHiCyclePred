@@ -9,6 +9,7 @@ import torch.nn as nn
 from pytorch_tools import EarlyStopping
 
 from torch.optim import Adam
+from focal_loss import MultiClassFocalLossWithAlpha
 
 # 该函数用于固定所有的随机种子，包括PyTorch框架的随机种子，cuda的随机种子等，
 # 从而保证每次运行网络的时候相同输入的输出是固定的
@@ -21,21 +22,29 @@ def seed_torch(seed=2021):
     torch.backends.cudnn.deterministic = True
     torch.backends.cudnn.benchmark = False
 
+
+# 现在我们定义了两个方便的函数， 这两个函数允许我们在不存在所需所有GPU的情况下运行代码。
+def try_gpu(i=0):  #@save
+    """如果存在，则返回gpu(i)，否则返回cpu()"""
+    if torch.cuda.device_count() >= i + 1:
+        return torch.device(f'cuda:{i}')
+    return torch.device('cpu')
+
 # 读取BCP特征集
 def load_BCP_dict():
-    file_path = "../../Data/BCP/Full_chr/Multi_channel/Nor/Bin_contact_strength(chr).npy"
+    file_path = "../../Data/Bin_contact_strength/Full_chr/Multi_channel/Nor/Bin_contact_strength(chr).npy"
     Data = np.load(file_path, allow_pickle=True).item()
     return Data
 
 # 读取CDP特征集
 def load_CDP_dict():
-    CDP_file = "../../Data/CDD/CDD.txt"
+    CDP_file = "../../Data/MyCDD/CDD.txt"
     Data = pd.read_table(CDP_file, sep='\t', header='infer', names=None, index_col=None, dtype=None, engine=None,nrows=None)
     return Data
 
 # 读取SBCP特征集
 def load_SBCP_dict():
-    file_path = '../../Data/SICP/Small_Domain_Struct_Contact_pro_scale(up_tran)(1).npy'
+    file_path = '../../Data/Small_Domain_Struct_Contact_pro/Small_Domain_Struct_Contact_pro_scale(up_tran)(1).npy'
     Data = np.load(file_path, allow_pickle=True).item()
     return Data
 
@@ -74,7 +83,7 @@ def load_CDP_data(CDP, idX, Y):
         # [[0.0063179558030927, 0.0056127625585562, ..., 0.0018277457562478]]
         # 加上以后就是[0.0063179558030927, 0.0056127625585562, ..., 0.0018277457562478]
         X.append(value)
-    # print('CDD', X[:1])
+    # print('CDP', X[:1])
     deal_dataset = TensorDataset(torch.from_numpy(np.array(X).astype(float)), torch.from_numpy(np.array(Y).astype(int)))
     # print(deal_dataset[:1])
     return deal_dataset, np.array(X).shape[0]
@@ -92,8 +101,8 @@ def load_SBCP_data(SBCP, idX, Y):
             sbcp.append(SBCP[cell_name][chr])
         X.append(np.concatenate(sbcp).tolist())
     print(np.array(X).shape)
-    # print('SICP', X[:3])
-    # print('SICP',X)
+    # print('SBCP', X[:3])
+    # print('SBCP',X)
     deal_dataset = TensorDataset(torch.from_numpy(np.array(X).astype(float)), torch.from_numpy(np.array(Y).astype(int)))
     return deal_dataset, np.array(X).shape[0]
 
@@ -283,10 +292,10 @@ class montage_model(nn.Module):
             x = self.relu2(x)
             x = self.Linear(x)
             x = self.fc2(x)
-        x = nn.functional.log_softmax(x, dim=1)
+        # x = nn.functional.log_softmax(x, dim=1)
         return x
 
-def CNN_train(epoch, model, optimizer, train_loader, loss_fn):
+def CNN_train(epoch, model, optimizer, train_loader, loss_fn,device):
     train_loader_BCP, train_loader_CDP, train_loader_SBCP = train_loader
     i = 0
     for(images_BCP, labels_BCP),(images_CDP, labels_CDP),(images_SBCP, labels_SBCP) in zip(train_loader_BCP, train_loader_CDP, train_loader_SBCP):
@@ -299,20 +308,20 @@ def CNN_train(epoch, model, optimizer, train_loader, loss_fn):
         # 清空过往梯度
         optimizer.zero_grad()
         labels = torch.Tensor(labels_BCP.type(torch.FloatTensor)).long()
+        labels = labels.to(device)
         # torch.unsqueeze()这个函数主要是对数据维度进行扩充.
         # 这里就是相当于加了一维通道，形成[批次，通道，特征]三个维度。
         images_BCP = torch.unsqueeze(images_BCP.type(torch.FloatTensor), dim=1)
         images_CDP = torch.unsqueeze(images_CDP.type(torch.FloatTensor), dim=1)
         images_SBCP = torch.unsqueeze(images_SBCP.type(torch.FloatTensor), dim=1)
+        images_BCP = images_BCP.to(device)
+        images_CDP = images_CDP.to(device)
+        images_SBCP = images_SBCP.to(device)
         size1 = images_BCP.shape   # torch.Size([64, 1, 2660])
         size2 = images_CDP.shape   # torch.Size([64, 1, 98])
         size3 = images_SBCP.shape  # torch.Size([64, 1, 2660])
-        # images = images.to(device)
-        # labels = labels.to(device)
         outputs = model(images_BCP, images_CDP, images_SBCP)
-        # loss_fn = nn.CrossEntropyLoss()
-        # 其中输入的第一个参数，也就是outputs不需要自己用softmax进行归一化，也不需要保证是正数。
-        # 所以我们输入的是使用log_softmax处理以后，不是归一化的数据。
+        #  loss_fn = MultiClassFocalLossWithAlpha(alpha=alpha, gamma=gamma)
         train_loss = loss_fn(outputs, labels)
         train_loss.backward()
         optimizer.step()
@@ -349,20 +358,20 @@ def CNN_train(epoch, model, optimizer, train_loader, loss_fn):
         i = i + 1
     return model, optimizer
 
-def CNN_val(epoch, model, test_loader, loss_fn, test_size):
+def CNN_val(epoch, model, test_loader, loss_fn, test_size, device):
     val_loader_BCP, val_loader_CDP, val_loader_SBCP= test_loader
     i = 0
     for (images_BCP, labels_BCP),(images_CDP, labels_CDP),(images_SBCP, labels_SBCP) in zip(val_loader_BCP, val_loader_CDP, val_loader_SBCP):
         images_BCP = torch.unsqueeze(images_BCP.type(torch.FloatTensor), dim=1)
         images_CDP = torch.unsqueeze(images_CDP.type(torch.FloatTensor), dim=1)
         images_SBCP = torch.unsqueeze(images_SBCP.type(torch.FloatTensor), dim=1)
-        # images = images.to(device)train_loader
-        # labels = labels.to(device)
+        images_BCP = images_BCP.to(device)
+        images_CDP = images_CDP.to(device)
+        images_SBCP = images_SBCP.to(device)
         labels = torch.Tensor(labels_BCP.type(torch.FloatTensor)).long()
+        labels = labels.to(device)
         outputs = model(images_BCP, images_CDP, images_SBCP)
-        # loss_fn = nn.CrossEntropyLoss()
-        # 其中输入的第一个参数，也就是outputs不需要自己用softmax进行归一化，也不需要保证是正数。
-        # 所以我们输入的是使用log_softmax处理以后，不是归一化的数据。
+        # loss_fn = MultiClassFocalLossWithAlpha(alpha=alpha, gamma=gamma)
         val_loss = loss_fn(outputs, labels)
         # 下面这一句有没有都可以，因为验证集就一个批次，封装验证集的dataloader的时候，批次大小直接=val_size
         # 也就是load_loader函数中batch_size=val_size
@@ -391,7 +400,7 @@ def load_loader(train_dataset, val_dataset, val_size):
 
 # tr_x, val_x都是细胞代号的集合，形如[['1CDX1_1'] ['1CDX1_317']...['1CDX3_272'] ['1CDX3_334']]
 # tr_y, val_y是真实的类别标签，形如：[['G1'] ['G1']...['mid_S'] ['mid_S']]
-def CNN_1D_montage(BCP, CDP, SBCP, tr_x, tr_y, val_x, val_y, lr, fold, model_para):
+def CNN_1D_montage(BCP, CDP, SBCP, tr_x, tr_y, val_x, val_y, lr, fold, model_para, alpha, gamma):
     # device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
     # seed_torch()函数用于固定所有的随机种子，从而保证每次运行网络的时候相同输入的输出是固定的
@@ -415,6 +424,8 @@ def CNN_1D_montage(BCP, CDP, SBCP, tr_x, tr_y, val_x, val_y, lr, fold, model_par
     train_loader_CDP, val_loader_CDP = load_loader(train_dataset_CDP, val_dataset_CDP, val_size_CDP)
     train_loader_SBCP, val_loader_SBCP = load_loader(train_dataset_SBCP, val_dataset_SBCP, val_size_SBCP)
     model = montage_model(model_para)
+    device = try_gpu(3)
+    model.to(device)
     print(model)
     train_loader = [train_loader_BCP, train_loader_CDP, train_loader_SBCP]
     val_loader = [val_loader_BCP, val_loader_CDP, val_loader_SBCP]
@@ -429,15 +440,15 @@ def CNN_1D_montage(BCP, CDP, SBCP, tr_x, tr_y, val_x, val_y, lr, fold, model_par
     num_epochs = 150
     min_loss = 100000.0
     optimizer = Adam(model.parameters(), lr=lr)
-    loss_fn = nn.CrossEntropyLoss()
-    path = "./model/model_construct/Cross%s/" % fold
+    loss_fn = MultiClassFocalLossWithAlpha(alpha=alpha, gamma=gamma)
+    path = "../model/model_construct_lr=000001/Cross%s/" % fold
     for epoch in range(num_epochs):
         model.train()
-        model, optimizer = CNN_train(epoch, model, optimizer, train_loader, loss_fn)
+        model, optimizer = CNN_train(epoch, model, optimizer, train_loader, loss_fn,device)
         model.eval()
         val_label, label, val_loss, model, val_accuracy = CNN_val(epoch, model, val_loader,
-                                                                          loss_fn, val_size_BCP)
-        #  def __call__(self, val_loss, model, path, inter_fold):
+                                                                          loss_fn, val_size_BCP,device)
+        #  def __call__(self, val_loss, model_testupdate5, path, inter_fold):
         # 看一下这个early_stopping
         early_stopping(val_loss, model, path, fold)
         if early_stopping.early_stop:
@@ -445,10 +456,10 @@ def CNN_1D_montage(BCP, CDP, SBCP, tr_x, tr_y, val_x, val_y, lr, fold, model_par
             model_path = path + "checkpoint%s.pt" % fold
             # torch.load("path路径")表示加载已经训练好的模型
             # 而model.load_state_dict（torch.load(PATH)）表示将训练好的模型参数重新加载至网络模型中
-            # model.load_state_dict(torch.load(model_path))只保存和恢复模型中的参数
+            # model_testupdate5.load_state_dict(torch.load(model_path))只保存和恢复模型中的参数
             model.load_state_dict(torch.load(model_path))
             val_label, label, val_loss, model, val_accuracy = CNN_val(100000, model,  val_loader,
-                                                                              loss_fn, val_size_BCP)
+                                                                              loss_fn, val_size_BCP,device)
             break
     torch.cuda.empty_cache()
 
