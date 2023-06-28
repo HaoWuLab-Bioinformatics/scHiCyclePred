@@ -229,10 +229,10 @@ class montage_model(nn.Module):
             x = self.relu2(x)
             x = self.Linear(x)
             x = self.fc2(x)
-        x = nn.functional.log_softmax(x, dim=1)
+        # x = nn.functional.log_softmax(x, dim=1)
         return x
 
-def CNN_train(epoch, model, optimizer, train_loader, loss_fn):
+def CNN_train(epoch, model, optimizer, train_loader, loss_fn, device):
     i = 0
     train_loader_BCP, train_loader_CDP, train_loader_SBCP = train_loader
     for  (images_BCP, labels_BCP),(images_CDP, labels_CDP),(images_SBCP, labels_SBCP) in zip(train_loader_BCP, train_loader_CDP, train_loader_SBCP):
@@ -244,11 +244,13 @@ def CNN_train(epoch, model, optimizer, train_loader, loss_fn):
         # print('labels_SBCP', labels_SBCP)
         optimizer.zero_grad()
         labels = torch.Tensor(labels_BCP.type(torch.FloatTensor)).long()
+        labels = labels.to(device)
         images_BCP = torch.unsqueeze(images_BCP.type(torch.FloatTensor), dim=1)
         images_CDP = torch.unsqueeze(images_CDP.type(torch.FloatTensor), dim=1)
         images_SBCP = torch.unsqueeze(images_SBCP.type(torch.FloatTensor), dim=1)
-        # images = images.to(device)
-        # labels = labels.to(device)
+        images_BCP = images_BCP.to(device)
+        images_CDP = images_CDP.to(device)
+        images_SBCP = images_SBCP.to(device)
         outputs = model(images_BCP, images_CDP, images_SBCP)
         train_loss = loss_fn(outputs, labels)
         train_loss.backward()
@@ -261,16 +263,18 @@ def CNN_train(epoch, model, optimizer, train_loader, loss_fn):
         i += 1
     return model, optimizer
 
-def CNN_val(epoch,model, test_loader, loss_fn, test_size):
+def CNN_val(epoch,model, test_loader, loss_fn, test_size, device):
     val_loader_BCP, val_loader_CDP, val_loader_SBCP= test_loader
     i = 0
     for(images_BCP, labels_BCP),(images_CDP, labels_CDP),(images_SBCP, labels_SBCP) in zip(val_loader_BCP, val_loader_CDP, val_loader_SBCP):
         images_BCP = torch.unsqueeze(images_BCP.type(torch.FloatTensor), dim=1)
         images_CDP = torch.unsqueeze(images_CDP.type(torch.FloatTensor), dim=1)
         images_SBCP = torch.unsqueeze(images_SBCP.type(torch.FloatTensor), dim=1)
-        # images = images.to(device)train_loader
-        # labels = labels.to(device)
+        images_BCP = images_BCP.to(device)
+        images_CDP = images_CDP.to(device)
+        images_SBCP = images_SBCP.to(device)
         labels = torch.Tensor(labels_BCP.type(torch.FloatTensor)).long()
+        labels = labels.to(device)
         outputs = model(images_BCP, images_CDP, images_SBCP)
         val_loss = loss_fn(outputs, labels)
         _, prediction = torch.max(outputs.data, 1)
@@ -294,36 +298,36 @@ def load_loader(train_dataset,test_dataset,test_size):
                             shuffle=False)
     return train_loader, test_loader
 
-def CNN_1D_montage(BCP,CDP,SBCP, tr_x, tr_y, X_test, y_test, lr, model_para):
+def CNN_1D_montage(BCP_train, CDP_train, SBCP_train,BCP_test_update5, CDP_test_update5, SBCP_test_update5, tr_x, tr_y, X_test, y_test, lr, model_para, alpha, gamma):
     # device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     fold = 'test'
     seed_torch()
-    train_dataset_BCP, train_size_BCP = load_BCP_data(BCP, tr_x, tr_y)
-    test_dataset_BCP, test_size_BCP = load_BCP_data(BCP, X_test, y_test)
-    train_dataset_CDP, train_size_CDP = load_CDP_data(CDP, tr_x, tr_y)
-    test_dataset_CDP, test_size_CDP = load_CDP_data(CDP, X_test, y_test)
-    train_dataset_SBCP, train_size_SBCP = load_SBCP_data(SBCP, tr_x, tr_y)
-    test_dataset_SBCP, test_size_SBCP = load_SBCP_data(SBCP, X_test, y_test)
+    train_dataset_BCP, train_size_BCP = load_BCP_data(BCP_train, tr_x, tr_y)
+    test_dataset_BCP, test_size_BCP = load_BCP_data(BCP_test_update5, X_test, y_test)
+    train_dataset_CDP, train_size_CDP = load_CDP_data(CDP_train, tr_x, tr_y)
+    test_dataset_CDP, test_size_CDP = load_CDP_data(CDP_test_update5, X_test, y_test)
+    train_dataset_SBCP, train_size_SBCP = load_SBCP_data(SBCP_train, tr_x, tr_y)
+    test_dataset_SBCP, test_size_SBCP = load_SBCP_data(SBCP_test_update5, X_test, y_test)
 
     train_loader_BCP, test_loader_BCP = load_loader(train_dataset_BCP,test_dataset_BCP, test_size_BCP)
     train_loader_CDP,  test_loader_CDP = load_loader(train_dataset_CDP, test_dataset_CDP, test_size_CDP)
     train_loader_SBCP, test_loader_SBCP = load_loader(train_dataset_SBCP, test_dataset_SBCP, test_size_SBCP)
     model = montage_model(model_para)
+    device = try_gpu(3)
+    model.to(device)
     print(model)
     train_loader = [train_loader_BCP, train_loader_CDP,train_loader_SBCP]
     test_loader = [test_loader_BCP, test_loader_CDP, test_loader_SBCP]
     num_epochs = 100
     min_loss = 100000.0
     optimizer = Adam(model.parameters(), lr=lr)
-    loss_fn = nn.CrossEntropyLoss()
-    path = "../model/model_test/"
+    loss_fn = MultiClassFocalLossWithAlpha(alpha=alpha, gamma=gamma)
     for epoch in range(num_epochs):
         model.train()
-        model, optimizer = CNN_train(epoch, model, optimizer, train_loader, loss_fn)
+        model, optimizer = CNN_train(epoch, model, optimizer, train_loader, loss_fn,device)
         model.eval()
         test_label, label, test_loss, model, test_accuracy = CNN_val(epoch, model, test_loader,
-                                                                          loss_fn, test_size_BCP)
+                                                                          loss_fn, test_size_BCP,device)
     torch.cuda.empty_cache()
 
     return test_accuracy, test_label, label
-
