@@ -1,0 +1,1 @@
+This folder is used to store the results on the validation set when building the model

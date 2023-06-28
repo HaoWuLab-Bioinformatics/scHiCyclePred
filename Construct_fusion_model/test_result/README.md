@@ -1,0 +1,1 @@
+This folder is used to store the results on the test set when testing the model

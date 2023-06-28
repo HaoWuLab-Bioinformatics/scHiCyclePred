@@ -1,11 +1,10 @@
-from collections import Counter
-
 import pandas as pd
+import xlsxwriter
 import numpy as np
 from feature_fusion_fl2_auc.whole_train_set.method_whole_train_set import load_BCP_dict, load_CDP_dict, load_SBCP_dict, CNN_1D_montage
 from sklearn.model_selection import train_test_split
 import random, os, torch
-from sklearn.metrics import f1_score, precision_score, adjusted_rand_score
+from sklearn.metrics import f1_score, precision_score, balanced_accuracy_score
 
 def seed_torch(seed=2021):
     random.seed(seed)
@@ -61,40 +60,44 @@ def main():
 
     Con_layer = [Con_layer_BCP,Con_layer_CDP,Con_layer_SBCP]
     linear_layer = 1
-    X_train, X_test, y_train, y_test = train_test_split(X_index, Y, test_size=0.2, random_state=2023, stratify=Y)
-    # kernel_size = 7
-    # cnn_feature = 32
-    # out_feature = 0
-    # dp = 0.2
-    # lr = 0.0001
-    # gamma = 1
+    file = '../test_result/CDD&BCP&SBCP_result_随机70_withbacc.xlsx'
+    workbook = xlsxwriter.Workbook(file)
+    worksheet1 = workbook.add_worksheet('model')
+    worksheet1.write(0, 0, '随机种子')
+    worksheet1.write(0, 1, 'test_acc')
+    worksheet1.write(0, 2, 'macro_F1')
+    worksheet1.write(0, 3, 'macro_Precision')
+    worksheet1.write(0, 4, 'bacc')
+    row = 0
+    linear_layer = 1
     kernel_size = 7
     cnn_feature = 32
     out_feature = 0
-    dp = 0.3
-    lr = 0.00001
+    dp = 0.2
+    lr = 0.0001
     gamma = 1
-    model_para = [kernel_size, cnn_feature, dp, out_feature, Con_layer, linear_layer]
-    test_acc, test_label, real_label = CNN_1D_montage(BCP, CDP, SBCP, X_train, y_train, X_test, y_test, lr, model_para, alpha, gamma)
-    print('test_acc: ', test_acc)
-
-    label_count = []
-    for i, j in zip(test_label, real_label):
-        if i == j:
-            label_count.append(i)
-    print("预测结果：", Counter(label_count))
-
-
-    micro_F1 = f1_score(real_label, test_label, average='micro')
-    print("micro_F1：", micro_F1)
-    macro_F1 = f1_score(real_label, test_label, average='macro')
-    print("macro_F1：", macro_F1)
-    micro_Precision = precision_score(real_label, test_label, average='micro')
-    print("micro_Precision：", micro_Precision)
-    macro_Precision = precision_score(real_label, test_label, average='macro')
-    print("macro_Precision：", macro_Precision)
-    ari = adjusted_rand_score(real_label, test_label)
-    print("ARI：", ari)
+    random.seed(516)
+    rand_array0 = random.sample(range(0, 10000), 70)
+    for rs in rand_array0:
+        X_train, X_test, y_train, y_test = train_test_split(X_index, Y, test_size=0.2, random_state=rs, stratify=Y)
+        row += 1
+        model_para = [kernel_size, cnn_feature, dp, out_feature, Con_layer, linear_layer]
+        test_acc, test_label, real_label = CNN_1D_montage(BCP, CDP, SBCP, X_train, y_train, X_test, y_test, lr, model_para, alpha, gamma)
+        label_count = []
+        for i, j in zip(test_label, real_label):
+            if i == j:
+                label_count.append(i)
+        micro_F1 = f1_score(real_label, test_label, average='micro')
+        macro_F1 = f1_score(real_label, test_label, average='macro')
+        micro_Precision = precision_score(real_label, test_label, average='micro')
+        macro_Precision = precision_score(real_label, test_label, average='macro')
+        bacc =  balanced_accuracy_score(real_label, test_label)
+        worksheet1.write(row, 0, rs)
+        worksheet1.write(row, 1, test_acc)
+        worksheet1.write(row, 2, macro_F1)
+        worksheet1.write(row, 3, macro_Precision)
+        worksheet1.write(row, 4, bacc)
+    workbook.close()
 
 if __name__ == '__main__':
     main()
