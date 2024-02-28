@@ -40,7 +40,7 @@ The framework of scHiCyclePred is as follows：
 
 ## Dependency
 
-Mainly used libraries:
+Libraries:
 
 Python 3.6
 
@@ -59,6 +59,10 @@ Xlsxwriter 3.0.3
 random
 
 os
+
+itertools
+
+collections
 
 
 
