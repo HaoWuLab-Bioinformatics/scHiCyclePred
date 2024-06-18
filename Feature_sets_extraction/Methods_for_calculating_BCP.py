@@ -41,8 +41,8 @@ def sum_matrix(matrix):
     return sum(sum(U + D))
 
 
-# Generate_BCP&SICP.py file will call this function, passing in a list of cell paths, in the form of
-# ['./Data/chr_matrix/1CDX1/1.1XDC11G_reads', './Data/chr_matrix/1CDX1/2.1XDC11G_reads', ...]
+# Generate_BCPandSICP.py file will call this function, passing in a list of cell paths, in the form of
+# ['./Data_Preparation/Data/chr_matrix/1CDX1/1.1XDC11G_reads', './Data_Preparation/Data/chr_matrix/1CDX1/2.1XDC11G_reads', ...]
 def calculate_Bin_contact_pro(file_list):
     # generate_bin() function is used to return a dictionary in which the number of blocks that can be cut out of each chromosome is stored, in the shape of.
     # {'chr1': 198, 'chr2': 183, 'chr3': 161, 'chr4': 157, 'chr5': 153, 'chr6': 150, 'chr7': 153, 'chr8': 132, 'chr9': 125, 'chr10': 131, 'chr11': 123, 'chr12': 122, 'chr13': 121, 'chr14': 126, 'chr15': 105, 'chr16': 99, 'chr17': 96, 'chr18': 91, 'chr19': 62, 'chrX': 172, 'chrY': 92}
@@ -68,6 +68,6 @@ def calculate_Bin_contact_pro(file_list):
             Bcp = Bin_contact_pro(contact_matrix, index[chr])
             # Bcp is the contact probability for each segment on chromosome chr (contact probability = total number of contacts for that segment / total number of contacts on the chromosome = sum of a row in the contact matrix / sum of all elements in the matrix)
             cell_dict[i.split('/')[4]][chr] = Bcp
-    out_path1 = '../Data/BCP/Full_chr/BCP(chr).npy'
+    out_path1 = './Data/BCP.npy'
     np.save(out_path1, cell_dict)
 # calculate_Decay()
