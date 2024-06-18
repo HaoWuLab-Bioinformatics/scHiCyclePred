@@ -7,7 +7,8 @@ Counts the probability of different distances between two contacts in contact
 import numpy as np
 import os
 import math
-import xlsxwriter
+# import xlsxwriter
+from openpyxl import Workbook
 import pandas as pd
 
 # This function is used to read the list of contacts in the cell contact file
@@ -40,23 +41,35 @@ def creat_txt(input_path):
     # file = open(output_path,)
     return output_path
 
-file = '../Data/CDD.xlsx'
-workbook = xlsxwriter.Workbook(file)
-worksheet1 = workbook.add_worksheet('result')
-worksheet1.write(0, 0, 'cell_name')
+file = './Data/CDD.xlsx'
+# workbook = xlsxwriter.Workbook(file)
+# worksheet1 = workbook.add_worksheet('result')
+# 创建一个新的Workbook对象，如果文件已存在则会被覆盖
+
+workbook = Workbook()
+# 选择活动工作表（或者通过workbook.create_sheet(title='result')创建一个名为'result'的工作表）
+worksheet1 = workbook.active  # 默认活动工作表即为第一个工作表，也可以命名为'result'
+
+# worksheet1.write(0, 0, 'cell_name')
+# 在第一行第一列写入单元格名称
+worksheet1.cell(row=1, column=1, value='cell_name')
+
+# 循环写入数据，注意Excel的行和列通常从1开始编号
 for i in range(1, 99):
     s = "bin_%s" % str(i+34)
-    worksheet1.write(0, i, s)
-types = ['1CDES','1CDU','1CDX1','1CDX2','1CDX3','1CDX4']
+    # worksheet1.write(0, i, s)
+    worksheet1.cell(row=1, column=i + 1, value=s)  # 列从1开始，所以i+1
+types = ['1CDX1','1CDX2','1CDX3','1CDX4']
 cell_id = 0
 for type in types:
-    outer_path = './Data/mapped_data/%s'%(type)
+    outer_path = './Data_Preparation/Data/mapped_data/%s'%(type)
     folderlist = os.listdir(outer_path)
     folderlist.sort()
     for folder in folderlist:
         cell_name = folder
         cell_id += 1
-        worksheet1.write(cell_id, 0, cell_name)
+        # worksheet1.write(cell_id, 0, cell_name)
+        worksheet1.cell(row=cell_id+1, column=1, value=cell_name)
         cell_path = outer_path+"/"+folder
         print(cell_path)
         pair_list = read_pair(cell_path)
@@ -93,10 +106,13 @@ for type in types:
         # 98个 {118: 164, 37: 577, 60: 842, 119: 132, 88: 268, 64: 954, 111: 186, 41: 578, 61: 932, 67: 821, 50: 690, 69: 808, 52: 768, 74: 677, 77: 734, 91: 214, 57: 767, 59: 779, 47: 651, 84: 410, 44: 613, 87: 250, 51: 692, 104: 161, 45: 595, 40: 582, 66: 821, 54: 771, 36: 607, 76: 587, 72: 889, 43: 637, 75: 733, 73: 719, 115: 243, 116: 198, 63: 799, 83: 411, 78: 622, 53: 669, 68: 833, 129: 23, 58: 856, 103: 201, 89: 215, 93: 192, 42: 529, 71: 882, 48: 682, 46: 609, 81: 484, 35: 240, 65: 794, 39: 593, 56: 775, 113: 199, 49: 608, 82: 462, 85: 362, 38: 582, 96: 165, 114: 254, 95: 191, 90: 165, 55: 783, 120: 190, 70: 865, 99: 163, 100: 176, 62: 898, 128: 27, 80: 514, 97: 189, 86: 297, 109: 157, 79: 540, 117: 164, 108: 231, 112: 227, 101: 156, 131: 8, 94: 170, 92: 162, 107: 209, 110: 193, 105: 143, 98: 157, 121: 139, 106: 125, 102: 170, 122: 116, 130: 48, 123: 110, 126: 42, 127: 42, 125: 65, 124: 95, 132: 30}
         for key in sorted(bin_dict.keys()):
             bin_dict[key] = bin_dict[key]/count_sum
-            worksheet1.write(cell_id, key-34, bin_dict[key])
+            # worksheet1.write(cell_id, key-34, bin_dict[key])
+            worksheet1.cell(row=cell_id + 1, column=key-34+1, value=bin_dict[key])
             # 这个就是CDD.txt
-workbook.close()
+# workbook.close()
+# 保存Workbook到文件
+workbook.save(filename=file)
 
-input_path = r'../Data/CDD.xlsx'
+input_path = r'./Data/CDD.xlsx'
 output_path = creat_txt(input_path)
 Excel_to_Txt(input_path, output_path)
