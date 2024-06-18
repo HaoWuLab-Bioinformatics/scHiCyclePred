@@ -1,8 +1,8 @@
 '''
 The code on this page is used to generate the BCP feature set and the SICP feature set
 '''
-from Feature_sets_extraction.Methods_for_calculating_BCP import calculate_Bin_contact_pro
-from Feature_sets_extraction.Methods_for_calculating_SICP import calculate_Small_Domain_Struct_Contact_pro
+from Methods_for_calculating_BCP import calculate_Bin_contact_pro
+from Methods_for_calculating_SICP import calculate_Small_Domain_Struct_Contact_pro
 import numpy as np
 
 
@@ -28,19 +28,15 @@ def main():
         print(file_list)
         # replace function turns 1CDX1_1 into 1CDX1.1
         print(replace(file_names[i][0]))
-        if "1CDES"  in file_names[i][0]:
-            file_list.append("./Data/chr_matrix/1CDES/"+replace(file_names[i][0])+"_reads") #replace(file_names[i])+"_reads"
-        elif "1CDU"  in file_names[i][0]:
-            file_list.append("./Data/chr_matrix/1CDU/"+replace(file_names[i][0])+"_reads")
-        elif "1CDX1"  in file_names[i][0]:
-            file_list.append("./Data/chr_matrix/1CDX1/"+replace(file_names[i][0])+"_reads")
+        if "1CDX1"  in file_names[i][0]:
+            file_list.append("./Data_Preparation/Data/chr_matrix/1CDX1/"+replace(file_names[i][0])+"_reads")
         elif "1CDX2"  in file_names[i][0]:
-            file_list.append("./Data/chr_matrix/1CDX2/"+replace(file_names[i][0])+"_reads")
+            file_list.append("./Data_Preparation/Data/chr_matrix/1CDX2/"+replace(file_names[i][0])+"_reads")
         elif "1CDX3" in file_names[i][0]:
-            file_list.append("./Data/chr_matrix/1CDX3/" + replace(file_names[i][0])+"_reads")
+            file_list.append("./Data_Preparation/Data/chr_matrix/1CDX3/" + replace(file_names[i][0])+"_reads")
         elif "1CDX4" in file_names[i][0]:
-            file_list.append("./Data/chr_matrix/1CDX4/" + replace(file_names[i][0])+"_reads")
-    # ['./Data/chr_matrix/1CDX1/1.1XDC11G_reads', './Data/chr_matrix/1CDX1/2.1XDC11G_reads', ...]
+            file_list.append("./Data_Preparation/Data/chr_matrix/1CDX4/" + replace(file_names[i][0])+"_reads")
+
     # file_list is a list of cell paths, each of which points to the file generated after the two-step mapping of each cell, i.e. the contact information after cutting into bin.
     calculate_Bin_contact_pro(file_list) # BCP feature set
     calculate_Small_Domain_Struct_Contact_pro(file_list) # SICP feature set
