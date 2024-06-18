@@ -28,12 +28,12 @@ def mkdir(path):
 def list_of_groups(init_list, children_list_len):
   list_of_groups = zip(*(iter(init_list),) *children_list_len)
   end_list = [list(i) for i in list_of_groups]
-  count = len(init_list) % children_list_lenfend
+  count = len(init_list) % children_list_len
   end_list.append(init_list[-count:]) if count !=0 else end_list
   return end_list
 
 # This function is used to read the rows and columns of the path file into the program as a matrix
-def read_pair(path1, path2, path3):
+def read_pair3(path1, path2, path3):
     file1 = open(path1)
     file1.readline()
     a = []
@@ -48,6 +48,14 @@ def read_pair(path1, path2, path3):
     a = np.array(a).astype(str)
     return a
 
+def read_pair(path):
+    file = open(path)
+    file.readline()
+    a = []
+    for line in file.readlines():
+        a.append(line.split())
+    a = np.array(a).astype(str)
+    return a
 def find_scale(pair_list):
     p = pair_list.astype(int)
     L1 = np.concatenate(p[:,0:1])
@@ -102,19 +110,19 @@ def map_reads(pair_list):
 # 1, The first column in the GATC.friends file is the sequence number corresponding to the contact point
 # 2, The second column is the sequence number of the chromosome to which the contact point belongs
 # 3, The third column is the real coordinates of the contact point
-fend_path1 = "./Data/GATC_fend/GATC.fends1"
-fend_path2 = "./Data/GATC_fend/GATC.fends2"
-fend_path3 = "./Data/GATC_fend/GATC.fends3"
-fends_matrix = np.array(read_pair(fend_path1, fend_path2, fend_path3))
+fend_path1 = "./Data_Preparation/Data/GATC_fend/GATC.fends1"
+fend_path2 = "./Data_Preparation/Data/GATC_fend/GATC.fends2"
+fend_path3 = "./Data_Preparation/Data/GATC_fend/GATC.fends3"
+fends_matrix = np.array(read_pair3(fend_path1, fend_path2, fend_path3))
 print(fends_matrix)
 print("matrix over")
 more_fends = {}
 
 
-types = ['1CDES','1CDU','1CDX1','1CDX2','1CDX3','1CDX4'] #
+types = ['1CDX1','1CDX2','1CDX3','1CDX4'] #
 # cell_id = 0
 for type in types:
-    input_path = '../Raw_data/%s'%(type)
+    input_path = './Raw_data/%s'%(type)
     folderlist = os.listdir(input_path)
     # folderlist is a list where each element is the name of a folder, and each folder corresponds to a cell. Inside each folder are stored the number of contacts of fend1 and fend2
     # ['1CDES_p7.H10', '1CDES_p4.C12', '1CDES_p5.D2', '1CDES_p4.F1', '1CDES_p3.E8', '1CDES_p8.C5', '1CDES_p7.D5', '1CDES_p10.H8', '1CDES_p7.B4', '1CDES_p3.F3', '1CDES_p7.B6', '1CDES_p4.E10', '1CDES_p9.B7', '1CDES_p5.G9', '1CDES_p7.F10', '1CDES_p6.A3', '1CDES_p8.C11', '1CDES_p3.A3', '1CDES_p9.A12', '1CDES_p4.E8', '1CDES_p4.B10', '1CDES_p9.E6', '1CDES_p8.D2', '1CDES_p4.E11', '1CDES_p3.E11', '1CDES_p9.F3', '1CDES_p4.D11', '1CDES_p1.E3', '1CDES_p8.H9', '1CDES_p5.G2', '1CDES_p4.F2', '1CDES_p6.E5', '1CDES_p8.A7', '1CDES_p4.D9', '1CDES_p3.C11', '1CDES_p9.B11', '1CDES_p10.H11', '1CDES_p4.H1', '1CDES_p8.C3', '1CDES_p4.F9', '1CDES_p8.B7', '1CDES_p7.E11', '1CDES_p10.H6', '1CDES_p10.F1', '1CDES_p8.E8', '1CDES_p3.A9', '1CDES_p10.A11', '1CDES_p3.D6', '1CDES_p4.F11', '1CDES_p5.E8', '1CDES_p3.G10', '1CDES_p7.G10', '1CDES_p6.D11', '1CDES_p10.C2', '1CDES_p8.G6', '1CDES_p1.C6', '1CDES_p8.F7', '1CDES_p9.C11', '1CDES_p7.A7', '1CDES_p10.C10', '1CDES_p8.H5', '1CDES_p9.C7', '1CDES_p9.B2', '1CDES_p5.D7', '1CDES_p6.D3', '1CDES_p7.A3', '1CDES_p7.C10', '1CDES_p4.G3', '1CDES_p9.A10', '1CDES_p6.E1', '1CDES_p10.H1', '1CDES_p4.A8', '1CDES_p5.F11', '1CDES_p6.A2', '1CDES_p1.D5', '1CDES_p9.E10', '1CDES_p7.H4', '1CDES_p8.B9', '1CDES_p10.A5', '1CDES_p5.E3', '1CDES_p8.B3', '1CDES_p5.F6', '1CDES_p6.F9', '1CDES_p6.H6', '1CDES_p9.A1', '1CDES_p7.H3', '1CDES_p8.B5', '1CDES_p4.E5', '1CDES_p6.H12', '1CDES_p4.D4', '1CDES_p7.G6', '1CDES_p10.G11', '1CDES_p5.F4', '1CDES_p5.G7', '1CDES_p6.G4', '1CDES_p1.D4', '1CDES_p9.G7', '1CDES_p6.A5', '1CDES_p3.E7', '1CDES_p4.H10'...
@@ -124,9 +132,9 @@ for type in types:
         cell_name = folder
         # cell_id += 1
         cell_path = input_path+"/"+folder+"/adj"
-        output_path = "./Data/mapped_data/"+type+"/"+folder
+        output_path = "./Data_Preparation/Data/mapped_data/"+type+"/"+folder
         print(output_path)
-        mkdir("./Data/mapped_data/"+type)
+        mkdir("./Data_Preparation/Data/mapped_data/"+type)
         print(cell_path)
         # Return information on the number of contacts of a cell as a matrix
         pair_list = read_pair(cell_path).astype(int)
