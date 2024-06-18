@@ -35,7 +35,7 @@ def seed_torch(seed=2021):
 
 # This function is used to divide chromatin according to the specified resolution
 def generate_bin():
-    f = open("../mm10.main.nochrM.chrom.sizes")
+    f = open("./mm10.main.nochrM.chrom.sizes")
     index= {}
     lines = f.readlines()
     for line in lines:
