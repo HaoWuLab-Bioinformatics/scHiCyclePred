@@ -2,7 +2,7 @@
 The code on this page defines the functions used to calculate the SICP feature set
 '''
 
-from Feature_sets_extraction.methods import generate_bin, read_pair, generate_contact_matrix
+from methods import generate_bin, read_pair, generate_contact_matrix
 import numpy as np
 
 
@@ -37,7 +37,7 @@ def sum_matrix(matrix):
     return sum(sum(U + D))
 
 
-# Generate_BCP&SICP.py file will call this function, passing in a list of cell paths, in the shape of.
+# Generate_BCPandSICP.py file will call this function, passing in a list of cell paths, in the shape of.
 # ['. /Data/chr_matrix/1CDX1/1.1XDC11G_reads', '. /Data/chr_matrix/1CDX1/2.1XDC11G_reads', ...]
 # 1.1XDC11G_reads is a folder with 21 files holding the contact information of the 21 chromosomes after the two-step mapping
 def calculate_Small_Domain_Struct_Contact_pro(file_list):
@@ -67,6 +67,6 @@ def calculate_Small_Domain_Struct_Contact_pro(file_list):
             contact_matrix = generate_contact_matrix(index[chr], pair_list)
             SICP = Small_Domain_Struct_Contact_pro(contact_matrix, index[chr], scale)
             cell_SICP_dict[i.split('/')[4]][chr] = SICP
-    out_path1 = '../Data/SICP/Small_Domain_Struct_Contact_pro_scale(up_tran)(%s).npy'  % scale
+    out_path1 = './Data/SICP.npy'
     np.save(out_path1, cell_SICP_dict)
 
