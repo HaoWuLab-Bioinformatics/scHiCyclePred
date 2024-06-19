@@ -18,3 +18,5 @@ python .\Data_Preparation\data_filter4_count.py
 ```
 python .\Data_Preparation\data_filter_pos.py  
 ```
+
+### Note: You need to ensure that the folder you are reading does not contain any other unnecessary files.
