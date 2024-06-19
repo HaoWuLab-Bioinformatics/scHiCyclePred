@@ -6,7 +6,7 @@ A deep learning framework for predicting cell cycles from single-cell Hi-C data 
 
 ## Framework
 The general framework of scHiCyclePred is as follows：
-<img src="final_workflow.jpg"  />  
+<img src="final_framework.jpg"  />  
 (A) data preparation, scHiCyclePred combines read pair locus mapping file and chromatin interaction pair file to generate a unique chromosome contact matrices for each chromosome in every cell.   
 (B) Multiple Feature Sets, this study extracts three feature sets, contact probability distribution versus genomic distance (CDD), bin contact probability (BCP) and small intra-domain contact probability (SICP).   
 (C) Fusion-Prediction Model, we develop a deep learning model that combines convolution and feature fusion modules to accurately predict cell cycle phases.   
