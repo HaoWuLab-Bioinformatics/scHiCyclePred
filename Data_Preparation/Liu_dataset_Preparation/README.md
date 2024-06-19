@@ -2,4 +2,7 @@
 
 2、Extract the files ending with ".pairs.gz" from the compressed package and place them in the GSE223917 folder.
 
-3、
+3、Generate the data format required by Liu_dataset by executing the following statement.
+```
+
+```
