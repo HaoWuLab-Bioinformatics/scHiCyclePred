@@ -47,8 +47,9 @@ sklearn
 numpy   
 See "**requirements.txt"** for all detailed libraries.  
 Other developers can use the following command to install the dependencies contained in "**requirements.txt"**:
-`pip install -r requirements.txt`  
-
+```
+pip install -r requirements.txt
+```
 
 
 ## Usage
