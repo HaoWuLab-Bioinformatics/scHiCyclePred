@@ -4,5 +4,17 @@
 
 3、Generate the data format required by Liu_dataset by executing the following statement.
 ```
-
+python .\Data_Preparation\data_filter1.py  
+```
+```
+python .\Data_Preparation\data_filter2.py  
+```
+```
+python .\Data_Preparation\data_filter3.py  
+```
+```
+python .\Data_Preparation\data_filter4_count.py  
+```
+```
+python .\Data_Preparation\data_filter_pos.py  
 ```
