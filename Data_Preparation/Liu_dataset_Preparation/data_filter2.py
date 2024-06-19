@@ -48,14 +48,12 @@ def move_file(source_path, destination_folder):
 
 
 def main():
-    genome_file = open('./mm10.main.nochrM.chrom.sizes')  # positional argument 1 --> chromosome sizes
-    file_list = np.loadtxt('./cell_cycle.txt', dtype=str)  #
-    folder_path = './GSE_process1'  # 替换为你的文件夹路径
+    folder_path = './Data_Preparation/Liu_dataset_Preparation/GSE_process1'  # 替换为你的文件夹路径
     files = os.listdir(folder_path)
     for file in files:
-        mkdir('./GSE_process2/' + file.split('.')[0].split('_')[1])
+        mkdir('./Data_Preparation/Liu_dataset_Preparation/GSE_process2/' + file.split('.')[0].split('_')[1])
         # print(file.split('.')[0].split('_')[1])  # GaseE752226
-        path = './GSE_process1' + '/' + file
+        path = './Data_Preparation/Liu_dataset_Preparation/GSE_process1' + '/' + file
         f = open(path)
         a = []
         count = 1
@@ -63,7 +61,7 @@ def main():
             if count >= 25:
                 a.append(line.split())
             count += 1
-        write_reads(out_path='./GSE_process2/' + file.split('.')[0].split('_')[1], chr_pair_list=a)
+        write_reads(out_path='./Data_Preparation/Liu_dataset_Preparation/GSE_process2/' + file.split('.')[0].split('_')[1], chr_pair_list=a)
     print(files)
 
 if __name__ == '__main__':

@@ -43,19 +43,21 @@ def move_file(source_path, destination_folder):
     print(f"File moved from '{source_path}' to '{destination_path}'.")
 
 def main():
-    genome_file = open('./mm10.main.nochrM.chrom.sizes')  # positional argument 1 --> chromosome sizes
-    file_list = np.loadtxt('./cell_cycle.txt', dtype=str)   #
+    file_list = np.loadtxt('./Data_Preparation/Liu_dataset_Preparation/cell_cycle.txt', dtype=str)   #
     need_cell = []  # 选出需要的细胞
     for file in file_list:
         need_cell.append(file[0])
-    print(need_cell)
-    folder_path = './GSE223917'  # 解压出来的数据文件夹
+    # print(need_cell)
+    folder_path = './Data_Preparation/Liu_dataset_Preparation/GSE223917'  # 解压出来的数据文件夹
     files = os.listdir(folder_path)
+    print(files)
     for cell in files:
-        if contains_substring(cell, need_cell):
+        print(cell.split('_')[1].split('.')[0])
+        if contains_substring(cell.split('_')[1].split('.')[0], need_cell):
             source_file_path = folder_path + '/' + cell  # 替换为你的源文件路径
-            destination_folder = './GSE_process1'  # 替换为你的目标文件夹路径
+            destination_folder = './Data_Preparation/Liu_dataset_Preparation/GSE_process1'  # 替换为你的目标文件夹路径
             move_file(source_file_path, destination_folder)
+            print('over')
 
 if __name__ == '__main__':
     main()

@@ -85,12 +85,12 @@ def allocation_pair(bins,pair_list,chr_dict,out_path):
         write_reads(out_path,chr_name,chr_dict[chr_name])
 
 def main():
-    chromsizes = open('./mm10.main.nochrM.chrom.sizes')  # positional argument 1 --> chromosome sizes
-    folder = os.listdir('./GSE_process2')
+    chromsizes = open('./Data_Preparation/Liu_dataset_Preparation/mm10.main.nochrM.chrom.sizes')  # positional argument 1 --> chromosome sizes
+    folder = os.listdir('./Data_Preparation/Liu_dataset_Preparation/GSE_process2')
     bins, valid_chroms = define_bins(chromsizes, resolution)
     for file in folder:
-        cell_path = './GSE_process2/' + file + '/cell.txt'  # positional argument 3 --> BEDPE file
-        out_path = './GSE_process3_bin/' + file
+        cell_path = './Data_Preparation/Liu_dataset_Preparation/GSE_process2/' + file + '/cell.txt'  # positional argument 3 --> BEDPE file
+        out_path = './Data_Preparation/Liu_dataset_Preparation/GSE_process3_bin/' + file
         pair_list = read_pair(cell_path)
         chr_dict = generate_chrdict(valid_chroms)
         allocation_pair(bins,pair_list,chr_dict,out_path)

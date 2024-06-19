@@ -67,15 +67,14 @@ def remove_duplicate_lists(main_list):
     return unique_lists
 
 def main():
-    chromsizes = open('./mm10.main.nochrM.chrom.sizes')  # positional argument 1 --> chromosome sizes
-    folder = os.listdir('./GSE_process3_bin')
+    folder = os.listdir('./Data_Preparation/Liu_dataset_Preparation/GSE_process3_bin')
     folder.sort()
     for file1 in folder:
-        folder_list = os.listdir('./GSE_process3_bin/' + file1)
-        out_path = './GSE_final_bin_count/' + file1  # 这可能出问题了，可以重新跑一遍data_filter3
+        folder_list = os.listdir('./Data_Preparation/Liu_dataset_Preparation/GSE_process3_bin/' + file1)
+        out_path = './Data_Preparation/Liu_dataset_Preparation/GSE_final_bin_count/' + file1  # 这可能出问题了，可以重新跑一遍data_filter3
         mkdir(out_path)
         for folder in folder_list:  # 每个染色体
-            path = './GSE_process3_bin/' + file1 + '/' + folder
+            path = './Data_Preparation/Liu_dataset_Preparation/GSE_process3_bin/' + file1 + '/' + folder
             file = open(path)
             infor = []
             for line in file.readlines():
