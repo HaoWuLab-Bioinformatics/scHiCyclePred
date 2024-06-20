@@ -52,9 +52,9 @@ def calculate_Bin_contact_pro(file_list):
     cell_dict = {}
     # each i is a folder, under the folder is the contact information of 21 chromosomes but the Y chromosome is not considered in it, fend_to_bin.py does not consider Y when mapping
     for i in file_list:
-        cell_dict[i.split('/')[4]] = {}
+        cell_dict[i.split('/')[5]] = {}
         # i is. /Data/chr_matrix/1CDX4/1CDX1.1_reads"
-        # i.split('/')[4] returns: 1CDX1.1_reads
+        # i.split('/')[5] returns: 1CDX1.1_reads
         # i.split('/') returns: ['.' , 'Data', 'chr_matrix', '1CDX1', '1CDX1.1_reads']
         # 1CDX1.1_reads can be used as a code for a cell
         for chr in chr_list: # 循环21条染色体
@@ -67,7 +67,7 @@ def calculate_Bin_contact_pro(file_list):
             contact_matrix = generate_contact_matrix(index[chr], pair_list)
             Bcp = Bin_contact_pro(contact_matrix, index[chr])
             # Bcp is the contact probability for each segment on chromosome chr (contact probability = total number of contacts for that segment / total number of contacts on the chromosome = sum of a row in the contact matrix / sum of all elements in the matrix)
-            cell_dict[i.split('/')[4]][chr] = Bcp
+            cell_dict[i.split('/')[5]][chr] = Bcp
     out_path1 = './Data/BCP.npy'
     np.save(out_path1, cell_dict)
-# calculate_Decay()
+
