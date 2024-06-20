@@ -34,5 +34,23 @@ python .\Data_Preparation\data_filter_pos.py  # Generate folder GSE_pos
 | chr1  | 3052398 | chr1 | 4307873 |
 | chr1  | 3070049 | chr1 | 3075376 |
 
+### The data format in GSE_process3_bin/GasaE751001/chr1.txt is as follows:
+| bin_1  | bin_2 |
+| ------------- | ------------- |
+| 3  | 3 |
+| 3  | 27 |
+
+### The data format in GSE_final_bin_count/GasaE751001/chr1.txt is as follows:
+| bin_1  | bin_2 | count |
+| ------------- | ------------- | ------------- |
+| 3  | 3 | 16 |
+| 3  | 27 | 4 |
+
+### The data format in GSE_process2/GasaE751001/cell.txt is as follows:
+| chr_start  | loc_start | chr_end | loc_end | count |
+| ------------- | ------------- | ------------- | ------------- | ------------- |
+| chr1  | 3052398 | chr1 | 4307873 | 1 |
+| chr1  | 3070049 | chr1 | 3075376 | 1 |
+
 ### Note: You need to ensure that the folder (GSE223917) you are reading does not contain any other unnecessary files.
 
