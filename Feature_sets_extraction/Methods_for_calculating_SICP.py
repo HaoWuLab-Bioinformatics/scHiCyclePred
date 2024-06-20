@@ -52,9 +52,9 @@ def calculate_Small_Domain_Struct_Contact_pro(file_list):
     scale = 1
     cell_SICP_dict = {}
     for i in file_list:
-        cell_SICP_dict[i.split('/')[4]] = {}
+        cell_SICP_dict[i.split('/')[5]] = {}
         # i is. /Data/chr_matrix/1CDX4/1CDX1.1_reads"
-        # i.split('/')[4] returns: 1CDX1.1_reads
+        # i.split('/')[5] returns: 1CDX1.1_reads
         # i.split('/') returns: ['.' , 'Data', 'chr_matrix', '1CDX1', '1CDX1.1_reads']
         # 1CDX1.1_reads can be used as a code for a cell
         for chr in index.keys():
@@ -66,7 +66,7 @@ def calculate_Small_Domain_Struct_Contact_pro(file_list):
             # The returned contact_matrix is the contact matrix of the current cell with chromosome chr
             contact_matrix = generate_contact_matrix(index[chr], pair_list)
             SICP = Small_Domain_Struct_Contact_pro(contact_matrix, index[chr], scale)
-            cell_SICP_dict[i.split('/')[4]][chr] = SICP
+            cell_SICP_dict[i.split('/')[5]][chr] = SICP
     out_path1 = './Data/SICP.npy'
     np.save(out_path1, cell_SICP_dict)
 
