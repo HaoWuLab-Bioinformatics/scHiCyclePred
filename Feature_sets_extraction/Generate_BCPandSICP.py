@@ -28,7 +28,7 @@ def main():
         print(file_list)
         # replace function turns 1CDX1_1 into 1CDX1.1
         print(replace(file_names[i][0]))
-        if "1CDX1"  in file_names[i][0]:
+        if "1CDX1" in file_names[i][0]:
             file_list.append("./Data_Preparation/Data/chr_matrix/1CDX1/"+replace(file_names[i][0])+"_reads")
         elif "1CDX2"  in file_names[i][0]:
             file_list.append("./Data_Preparation/Data/chr_matrix/1CDX2/"+replace(file_names[i][0])+"_reads")
