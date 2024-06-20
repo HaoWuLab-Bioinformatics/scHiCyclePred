@@ -21,7 +21,7 @@ def stacking_model():
     X = np.array(cell_inf.values.tolist())[:, 0:1]
     file_path = "./Data/BCP.npy"
     Dict = np.load(file_path, allow_pickle=True).item()
-    print(Dict)
+    # print(Dict)
     index = generate_bin()
     print("start")
     chr_list = sorted(index.keys())
@@ -34,7 +34,7 @@ def stacking_model():
             cell_list.append(cell_name)
         cell_matrix = np.array(cell_matrix)
         for i in range(cell_matrix.shape[1]):
-            print(i)
+            # print(i)
             cell_matrix[:, i] = Normalization(cell_matrix[:, i])
         for id, cell_nm in enumerate(cell_list):
             Dict[cell_nm][chr] = cell_matrix[id, :]
