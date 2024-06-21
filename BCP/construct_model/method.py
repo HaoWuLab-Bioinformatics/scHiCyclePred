@@ -21,38 +21,34 @@ def seed_torch(seed=2021):
     torch.backends.cudnn.benchmark = False
 
 def load_BCP_dict():
-    file_path = "../../Data/BCP/Full_chr/Multi_channel/Nor/Bin_contact_strength(chr).npy"
+    file_path = "./Data/BCP_Nor.npy"
     Data = np.load(file_path, allow_pickle=True).item()
     return Data
-
-def load_CDP_dict():
-    CDP_file = "../../Data/CDD/CDD.txt"
-    Data = pd.read_table(CDP_file, sep='\t', header='infer', names=None, index_col=None, dtype=None, engine=None,
-                         nrows=None)
-    return Data
-
-def load_SBCP_dict():
-    file_path = '../../Data/SICP/Small_Domain_Struct_Contact_pro_scale(up_tran)(1).npy'
-    Data = np.load(file_path, allow_pickle=True).item()
-
-    return Data
-
 
 def load_BCP_data(BCP, idX, Y):
+    # generate_bin()函数用于返回一个字典，字典中存的是每条染色体能够切出的块的数目，形如：
+    # {'chr1': 198, 'chr2': 183, .... 'chrX': 172, 'chrY': 92}
     index = generate_bin()
     chr_list = sorted(index.keys())
+    # print('BCP',idX[:5])
     X = []
     for cell in idX:
         cell_name = replace_linetodot(cell[0]) + "_reads"
-        sbcp = []
+        bcp = []
         for chr in chr_list:
+            # 不考虑Y染色体的接触信息
             if chr == "chrY":
                 continue
-            sbcp.append(BCP[cell_name][chr])
-        X.append(np.concatenate(sbcp).tolist())
-    print(np.array(X).shape)
+            bcp.append(BCP[cell_name][chr])
+        X.append(np.concatenate(bcp).tolist())
+    # print(len(X))输出749。X是一个列表，其中的每一个元素也是一个一维列表，一个一维列表存的是一个细胞的全部bcp特征。
+    # print(np.array(X).shape)  # 如果输出(748, 2660)，也就是说当前的idX集合共有748个细胞，每个细胞对应一个包含有2660个特征数据的列表。一个细胞就对应一行数据
+    # print('BCP', X[:1])
+    # torch.from_numpy()方法把数组转换成张量
+    # 与torch.tensor()的区别：使用torch.from_numpy更加安全，使用tensor.Tensor在非float类型下会与预期不符。
     deal_dataset = TensorDataset(torch.from_numpy(np.array(X).astype(float)), torch.from_numpy(np.array(Y).astype(int)))
     return deal_dataset, np.array(X).shape[0]
+    # np.array(X).shape[0]返回的是当前当前的idX集合中细胞的个数
 
 
 class montage_model(nn.Module):
@@ -178,7 +174,7 @@ def CNN_1D_montage(BCP, tr_x, tr_y, val_x, val_y, lr, fold,model_para):
     min_loss = 100000.0
     optimizer = Adam(model.parameters(), lr=lr)
     loss_fn = nn.CrossEntropyLoss()
-    path = "./model/model_construct/Cross%s/" % fold
+    path = "./BCP/model/model_construct/Cross%s/" % fold
     for epoch in range(num_epochs):
         model.train()
         model, optimizer, train_loader = CNN_train(epoch, model, optimizer, train_loader, loss_fn)
