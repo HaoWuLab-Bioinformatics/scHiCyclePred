@@ -2,7 +2,7 @@ import pandas as pd
 import xlsxwriter
 from scipy import stats
 import numpy as np
-from method import load_BCP_dict, load_CDP_dict, load_SBCP_dict, CNN_1D_montage
+from method import load_CDP_dict, CNN_1D_montage
 from sklearn.model_selection import train_test_split, StratifiedKFold
 import random,os, torch
 
@@ -17,7 +17,7 @@ def seed_torch(seed=2021):
 
 
 def main():
-    path = "../../Data/new_cell_inf.txt"
+    path = "./Data/new_cell_inf.txt"
     cell_inf = pd.read_table(path, sep=' ', header='infer', names=None, index_col=None, dtype=None, engine=None,
                              nrows=None)
     cell_inf = cell_inf.sort_values(by='cycle', ascending=True)
@@ -37,7 +37,7 @@ def main():
     CDP = load_CDP_dict()
     Con_layer = 2
     linear_layer = 4
-    file = './model/montage_model(con%s-full%s)[16,32,64].xlsx' % (str(Con_layer),str(linear_layer))
+    file = './CDD/val_result/val_result.xlsx'
     workbook = xlsxwriter.Workbook(file)
     worksheet1 = workbook.add_worksheet('model')
     worksheet1.write(0, 1, 'kernel_size')
