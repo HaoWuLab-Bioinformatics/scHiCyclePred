@@ -125,41 +125,6 @@ def accuracy(predictions, labels):
     rights = pred.eq(labels.data.view_as(pred)).sum()
     return rights, len(labels)
 
-def find_path(cell):
-    if "1CDES" in cell:
-        input_path = "./Data/CNN_chr_data/1CDES/" + cell+".npy"
-    elif "1CDU" in cell:
-        input_path = "./Data/CNN_chr_data/1CDU/" + cell+".npy"
-    elif "1CDX1" in cell:
-        input_path = "./Data/CNN_chr_data/1CDX1/" + cell+".npy"
-
-    elif "1CDX2" in cell:
-        input_path = "./Data/CNN_chr_data/1CDX2/" + cell+".npy"
-    elif "1CDX3" in cell:
-        input_path = "./Data/CNN_chr_data/1CDX3/" + cell+".npy"
-    elif "1CDX4" in cell:
-        input_path = "./Data/CNN_chr_data/1CDX4/" + cell+".npy"
-    return input_path
-
-def load_contact_matrix_data(idX,Y):
-    index = generate_bin()
-    chr_list = sorted(index.keys())
-    X = []
-    for cell in idX:
-        cell_path = find_path(cell[0])
-        cell_Dict = np.load(cell_path, allow_pickle=True).item()
-        cell_matrix = []
-        for chr in chr_list:
-            if chr =="chrY":
-                continue
-            matrix = cell_Dict[chr]
-            cell_matrix.append(matrix)
-        X.append(cell_matrix)
-    print(np.array(X).shape)
-    print(len(Y))
-    deal_dataset = TensorDataset(torch.from_numpy(np.array(X).astype(float)), torch.from_numpy(np.array(Y).astype(int)))
-    return deal_dataset, np.array(X).shape[0]
-
 def vote(temp_test, valid_length, f_num):
     New_Test_Data = np.zeros((valid_length, f_num))
     for j in range(valid_length):
