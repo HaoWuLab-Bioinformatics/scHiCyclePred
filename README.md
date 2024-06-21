@@ -77,41 +77,41 @@ python .\Feature_sets_extraction\Generate_BCPandSICP.py
 ```
 python .\Feature_sets_extraction\Nor_BCP.py
 ```
-3. Construct_fusion_model : Build the fusion prediction model and determine some properties and hyperparameters of the depth model by running the `feature_BCP_SBCP_CDP.py` file in the `Construct_fusion_model/construct_model` folder. The above function is accomplished by implementing the following command line codes in order:
+3. Construct_fusion_model : Build the fusion prediction model and determine some properties and hyperparameters of the depth model by running the `feature_BCP_SBCP_CDP.py` file in the `Construct_fusion_model/construct_model` folder. This function can be accomplished by implementing the following command line codes in order:
 ```
 python .\Construct_fusion_model\construct_model\feature_BCP_SBCP_CDP.py
 ```
 
-4. Test_fusion_model: Test the fusion prediction model built in the previous step by running the `feature_BCP_SBCP_CDP_testModel.py` file in the `Construct_fusion_model/test_model` folder.
+4. Test_fusion_model: Test the fusion prediction model built in the previous step by running the `feature_BCP_SBCP_CDP_testModel.py` file in the `Construct_fusion_model/test_model` folder. This function can be accomplished by implementing the following command line codes in order:
 ```
 python .\Construct_fusion_model\test_model\feature_BCP_SBCP_CDP_testModel.py
 ```
-5. Construct_CDD_model : Build the CDD single feature set prediction model and determine some properties and hyperparameters of the depth model by running the `feature_CDD.py` file in the `CDD/construct_model` folder.
+5. Construct_CDD_model : Build the CDD single feature set prediction model and determine some properties and hyperparameters of the depth model by running the `feature_CDD.py` file in the `CDD/construct_model` folder. This function can be accomplished by implementing the following command line codes in order:
 ```
 python .\CDD\construct_model\feature_CDD.py
 ```
 
-6. Test_CDD_model: Test the CDD single feature set prediction model built in the previous step by running the `feature_CDD_testModel.py` file in the `CDD/test_model` folder.
+6. Test_CDD_model: Test the CDD single feature set prediction model built in the previous step by running the `feature_CDD_testModel.py` file in the `CDD/test_model` folder. This function can be accomplished by implementing the following command line codes in order:
 ```
 python .\CDD\test_model\feature_CDD_testModel.py
 ```
 
-7. Construct_BCP_model : Build the BCP single feature set prediction model and determine some properties and hyperparameters of the depth model by running the `feature_BCP.py` file in the `BCP/construct_model` folder.
+7. Construct_BCP_model : Build the BCP single feature set prediction model and determine some properties and hyperparameters of the depth model by running the `feature_BCP.py` file in the `BCP/construct_model` folder. This function can be accomplished by implementing the following command line codes in order:
 ```
 python .\BCP\construct_model\feature_BCP.py
 ```
 
-8. Test_BCP_model: Test the BCP single feature set prediction model built in the previous step by running the `feature_BCP_testModel.py` file in the `BCP/test_model` folder.
+8. Test_BCP_model: Test the BCP single feature set prediction model built in the previous step by running the `feature_BCP_testModel.py` file in the `BCP/test_model` folder. This function can be accomplished by implementing the following command line codes in order:
 ```
 python .\BCP\test_model\feature_BCP_testModel.py
 ```
 
-9. Construct_SICP_model : Build the SICP single feature set prediction model and determine some properties and hyperparameters of the depth model by running the `feature_SICP.py` file in the `SICP/construct_model` folder.
+9. Construct_SICP_model : Build the SICP single feature set prediction model and determine some properties and hyperparameters of the depth model by running the `feature_SICP.py` file in the `SICP/construct_model` folder. This function can be accomplished by implementing the following command line codes in order:
 ```
 python .\SICP\construct_model\feature_SICP.py
 ```
 
-10. Test_SICP_model: Test the SICP single feature set prediction model built in the previous step by running the `feature_SICP_testModel.py` file in the `SICP/test_model` folder.
+10. Test_SICP_model: Test the SICP single feature set prediction model built in the previous step by running the `feature_SICP_testModel.py` file in the `SICP/test_model` folder. This function can be accomplished by implementing the following command line codes in order:
 ```
 python .\SICP\test_model\feature_SICP_testModel.py
 ```
