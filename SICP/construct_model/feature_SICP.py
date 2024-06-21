@@ -2,14 +2,12 @@ import pandas as pd
 import xlsxwriter
 from scipy import stats
 import numpy as np
-from method import load_BCP_dict, load_CDP_dict, load_SICP_dict, CNN_1D_montage
+from method import load_SICP_dict, CNN_1D_montage
 from sklearn.model_selection import train_test_split, StratifiedKFold
 
 
-
-
 def main():
-    path = "../../Data/new_cell_inf.txt"
+    path = "./Data/new_cell_inf.txt"
     cell_inf = pd.read_table(path, sep=' ', header='infer', names=None, index_col=None, dtype=None, engine=None,
                              nrows=None)
     cell_inf = cell_inf.sort_values(by='cycle', ascending=True)
@@ -29,7 +27,7 @@ def main():
     SICP = load_SICP_dict()
     Con_layer = 1
     linear_layer =5
-    file = './model/montage_model(con%s-full%s)[16,32,64].xlsx' % (str(Con_layer),str(linear_layer))
+    file = './SICP/val_result/val_result.xlsx'
     workbook = xlsxwriter.Workbook(file)
     worksheet1 = workbook.add_worksheet('model')
     worksheet1.write(0, 1, 'kernel_size')
