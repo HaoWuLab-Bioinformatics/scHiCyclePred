@@ -23,7 +23,7 @@ resolution = 1000000
 #一些常用的方法
 
 def generate_bin():
-    f = open("mm10.main.nochrM.chrom.sizes")
+    f = open("./mm10.main.nochrM.chrom.sizes")
     index= {}
     lines = f.readlines()
     for line in lines:
