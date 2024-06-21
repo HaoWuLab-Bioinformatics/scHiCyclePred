@@ -85,3 +85,6 @@ python .\Feature_sets_extraction\Nor_BCP.py
 8. Test_BCP_model: Test the BCP single feature set prediction model built in the previous step by running the `feature_BCP(whole_train_set).py` file in the `BCP/test_model` folder.
 9. Construct_SICP_model : Build the SICP single feature set prediction model and determine some properties and hyperparameters of the depth model by running the `feature_SICP.py` file in the `SICP/construct_model` folder.
 10. Test_SICP_model: Test the SICP single feature set prediction model built in the previous step by running the `feature_SICP(whole_train_set).py` file in the `SICP/test_model` folder.
+
+## Computational cost and memory
+
