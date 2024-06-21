@@ -1,7 +1,7 @@
 import pandas as pd
 import xlsxwriter
 import numpy as np
-from feature_fusion_fl2_auc.whole_train_set.method_whole_train_set import load_BCP_dict, load_CDP_dict, load_SBCP_dict, CNN_1D_montage
+from method_whole_train_set import load_BCP_dict, load_CDP_dict, load_SBCP_dict, CNN_1D_montage
 from sklearn.model_selection import train_test_split
 import random, os, torch
 from sklearn.metrics import f1_score, precision_score, balanced_accuracy_score
@@ -17,7 +17,7 @@ def seed_torch(seed=2021):
 
 
 def main():
-    path = "../../Data/new_cell_inf.txt"
+    path = "./Data/new_cell_inf.txt"
     cell_inf = pd.read_table(path, sep=' ', header='infer', names=None, index_col=None, dtype=None, engine=None,
                              nrows=None)
     cell_inf = cell_inf.sort_values(by='cycle', ascending=True)
@@ -60,10 +60,10 @@ def main():
 
     Con_layer = [Con_layer_BCP,Con_layer_CDP,Con_layer_SBCP]
     linear_layer = 1
-    file = '../test_result/CDD&BCP&SBCP_result_随机70_withbacc.xlsx'
+    file = './Construct_fusion_model/test_result/test_result.xlsx'
     workbook = xlsxwriter.Workbook(file)
     worksheet1 = workbook.add_worksheet('model')
-    worksheet1.write(0, 0, '随机种子')
+    worksheet1.write(0, 0, 'random_seed')
     worksheet1.write(0, 1, 'test_acc')
     worksheet1.write(0, 2, 'macro_F1')
     worksheet1.write(0, 3, 'macro_Precision')
@@ -76,8 +76,10 @@ def main():
     dp = 0.2
     lr = 0.0001
     gamma = 1
-    random.seed(516)
-    rand_array0 = random.sample(range(0, 10000), 70)
+    rand_array0 = [3900, 8849, 9261, 8659, 258, 2796, 4547, 953, 4526, 2361, 2625, 8299, 8468,
+                   5980, 4340, 4858, 7814, 2272, 7804, 2375, 9896, 974, 7737, 9225, 1442, 7343,
+                   4955, 1474, 3916, 8026, 638, 7111, 6987, 245, 8635, 7396, 6605,
+                   5639, 5063, 7408, 7971, 4366, 618, 7575, 6390, 4622, 7676, 6571, 9194, 9643]
     for rs in rand_array0:
         X_train, X_test, y_train, y_test = train_test_split(X_index, Y, test_size=0.2, random_state=rs, stratify=Y)
         row += 1
