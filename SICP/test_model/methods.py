@@ -32,7 +32,7 @@ def seed_torch(seed=2021):
 
 
 def generate_bin():
-    f = open("../construct_model/mm10.main.nochrM.chrom.sizes")
+    f = open("./mm10.main.nochrM.chrom.sizes")
     index= {}
     lines = f.readlines()
     for line in lines:
