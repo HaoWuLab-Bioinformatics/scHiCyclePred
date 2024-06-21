@@ -21,7 +21,7 @@ def seed_torch(seed=2021):
 
 
 def load_CDP_dict():
-    CDP_file = "../../Data/CDD/CDD.txt"
+    CDP_file = "./Data/CDD.txt"
     Data = pd.read_table(CDP_file, sep='\t', header='infer', names=None, index_col=None, dtype=None, engine=None,
                          nrows=None)
     return Data
@@ -30,9 +30,11 @@ def load_CDP_data(CDP,idX,Y):
     X = []
     for cell in idX:
         cell_name = cell[0]
-        value = CDP.loc[CDP['cell_nm'] == replace_linetodot(cell_name)].values[:, 1:].tolist()[0]
+        value = CDP.loc[CDP['cell_name'] == replace_linetodot(cell_name)+"_reads"].values[:, 1:].tolist()[0]
         X.append(value)
+    # print('CDP', X[:1])
     deal_dataset = TensorDataset(torch.from_numpy(np.array(X).astype(float)), torch.from_numpy(np.array(Y).astype(int)))
+    # print(deal_dataset[:1])
     return deal_dataset, np.array(X).shape[0]
 
 class montage_model(nn.Module):
