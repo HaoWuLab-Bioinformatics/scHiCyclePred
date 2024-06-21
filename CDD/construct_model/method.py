@@ -19,30 +19,23 @@ def seed_torch(seed=2021):
     torch.backends.cudnn.deterministic = True
     torch.backends.cudnn.benchmark = False
 
-def load_BCP_dict():
-    file_path = "../../Data/BCP/Full_chr/Multi_channel/Nor/Bin_contact_strength(chr).npy"
-    Data = np.load(file_path, allow_pickle=True).item()
-    return Data
+
 
 def load_CDP_dict():
-    CDP_file = "../../Data/CDD/CDD.txt"
+    CDP_file = "./Data/CDD.txt"
     Data = pd.read_table(CDP_file, sep='\t', header='infer', names=None, index_col=None, dtype=None, engine=None,
                          nrows=None)
-    return Data
-
-def load_SBCP_dict():
-    file_path = '../../Data/SICP/Small_Domain_Struct_Contact_pro_scale(up_tran)(1).npy'
-    Data = np.load(file_path, allow_pickle=True).item()
-
     return Data
 
 def load_CDP_data(CDP,idX,Y):
     X = []
     for cell in idX:
         cell_name = cell[0]
-        value = CDP.loc[CDP['cell_nm'] == replace_linetodot(cell_name)].values[:, 1:].tolist()[0]
+        value = CDP.loc[CDP['cell_name'] == replace_linetodot(cell_name)+"_reads"].values[:, 1:].tolist()[0]
         X.append(value)
+    # print('CDP', X[:1])
     deal_dataset = TensorDataset(torch.from_numpy(np.array(X).astype(float)), torch.from_numpy(np.array(Y).astype(int)))
+    # print(deal_dataset[:1])
     return deal_dataset, np.array(X).shape[0]
 
 class montage_model(nn.Module):
@@ -168,7 +161,7 @@ def CNN_1D_montage(CDP, tr_x, tr_y, val_x, val_y, lr, fold,model_para):
     min_loss = 100000.0
     optimizer = Adam(model.parameters(), lr=lr)
     loss_fn = nn.CrossEntropyLoss()
-    path = "./model/model_construct/Cross%s/" % fold
+    path = "./CDD/model/model_construct/Cross%s/" % fold
     for epoch in range(num_epochs):
         model.train()
         model, optimizer, train_loader = CNN_train(epoch, model, optimizer, train_loader, loss_fn)
