@@ -86,5 +86,6 @@ python .\Feature_sets_extraction\Nor_BCP.py
 9. Construct_SICP_model : Build the SICP single feature set prediction model and determine some properties and hyperparameters of the depth model by running the `feature_SICP.py` file in the `SICP/construct_model` folder.
 10. Test_SICP_model: Test the SICP single feature set prediction model built in the previous step by running the `feature_SICP(whole_train_set).py` file in the `SICP/test_model` folder.
 
-## Computational cost and memory
+## Computational resources
 
+Our entire method is implemented on an NVIDIA A800 GPU. We have tested the computational resources utilized by our algorithm when processing Hi-C data from 6288 cells. It required at least 8GB of memory and 12GB of GPU memory, with a minimum runtime of 15 hours.
