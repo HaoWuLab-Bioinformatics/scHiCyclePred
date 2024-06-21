@@ -17,7 +17,7 @@ def seed_torch(seed=2022):
 
 
 def main():
-    path = "../../Data/new_cell_inf.txt"
+    path = "./Data/new_cell_inf.txt"
     cell_inf = pd.read_table(path, sep=' ', header='infer', names=None, index_col=None, dtype=None, engine=None,
                              nrows=None)
     cell_inf = cell_inf.sort_values(by='cycle', ascending=True)
@@ -72,9 +72,9 @@ def main():
 
     Con_layer = [Con_layer_BCP, Con_layer_CDP, Con_layer_SBCP]
 
-    file = '../val_result/montage_model_liner=1.xlsx'
+    file = './Construct_fusion_model/val_result/val_result.xlsx'
     workbook = xlsxwriter.Workbook(file)
-    worksheet1 = workbook.add_worksheet('model_testupdate5')
+    worksheet1 = workbook.add_worksheet('result')
     worksheet1.write(0, 1, 'kernel_size')
     worksheet1.write(0, 2, 'cnn_feature')
     worksheet1.write(0, 3, 'out_feature')
