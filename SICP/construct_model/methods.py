@@ -32,7 +32,7 @@ def seed_torch(seed=2021):
 
 
 def generate_bin():
-    f = open("mm10.main.nochrM.chrom.sizes")
+    f = open("./mm10.main.nochrM.chrom.sizes")
     index= {}
     lines = f.readlines()
     for line in lines:
@@ -916,7 +916,7 @@ def Logistic(train_x,train_y,test_x):
     clf.fit(train_x, train_y)
     label_pred = clf.predict(test_x)
     return label_pred
-    
+
 def DCTree(criterion,train_x,train_y,test_x,):
     clf = tree.DecisionTreeClassifier(criterion=criterion)  #
     clf = clf.fit(train_x, train_y)
