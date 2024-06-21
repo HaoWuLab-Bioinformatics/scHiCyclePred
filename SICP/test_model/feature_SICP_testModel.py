@@ -9,7 +9,7 @@ from collections import Counter
 
 
 def main():
-    path = "../../Data/new_cell_inf.txt"
+    path = "./Data/new_cell_inf.txt"
     cell_inf = pd.read_table(path, sep=' ', header='infer', names=None, index_col=None, dtype=None, engine=None,
                              nrows=None)
     cell_inf = cell_inf.sort_values(by='cycle', ascending=True)
