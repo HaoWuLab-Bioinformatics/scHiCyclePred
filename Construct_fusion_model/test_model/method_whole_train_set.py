@@ -1,14 +1,18 @@
 import os, random
-
 import pandas as pd
 import numpy as np
 from methods import generate_bin, replace_linetodot, replace_dottoline, padding, matrix_list
 from torch.utils.data import DataLoader, TensorDataset
 import torch
 import torch.nn as nn
-from pytorch_tools import EarlyStopping
-
+from focal_loss import MultiClassFocalLossWithAlpha
 from torch.optim import Adam
+
+def try_gpu(i=0):  #@save
+    """如果存在，则返回gpu(i)，否则返回cpu()"""
+    if torch.cuda.device_count() >= i + 1:
+        return torch.device(f'cuda:{i}')
+    return torch.device('cpu')
 
 def seed_torch(seed=2021):
     random.seed(seed)
@@ -20,48 +24,53 @@ def seed_torch(seed=2021):
     torch.backends.cudnn.benchmark = False
 
 def load_BCP_dict():
-    file_path = "../../Data/BCP/Full_chr/Multi_channel/Nor/Bin_contact_strength(chr).npy"
+    file_path = "./Data/BCP_Nor.npy"
     Data = np.load(file_path, allow_pickle=True).item()
     return Data
 
 def load_CDP_dict():
-    CDP_file = "../../Data/CDD/CDD.txt"
+    CDP_file = "./Data/CDD.txt"
     Data = pd.read_table(CDP_file, sep='\t', header='infer', names=None, index_col=None, dtype=None, engine=None,
                          nrows=None)
     return Data
 
 def load_SBCP_dict():
-    file_path = '../../Data/SICP/Small_Domain_Struct_Contact_pro_scale(up_tran)(1).npy'
+    file_path = './Data/SICP.npy'
     Data = np.load(file_path, allow_pickle=True).item()
 
     return Data
 
-
 def load_BCP_data(BCP, idX, Y):
+    # generate_bin()函数用于返回一个字典，字典中存的是每条染色体能够切出的块的数目，形如：
+    # {'chr1': 198, 'chr2': 183, .... 'chrX': 172, 'chrY': 92}
     index = generate_bin()
     chr_list = sorted(index.keys())
     # print('BCP',idX[:5])
     X = []
     for cell in idX:
         cell_name = replace_linetodot(cell[0]) + "_reads"
-        sbcp = []
+        bcp = []
         for chr in chr_list:
+            # 不考虑Y染色体的接触信息
             if chr == "chrY":
                 continue
-            sbcp.append(BCP[cell_name][chr])
-        X.append(np.concatenate(sbcp).tolist())
-    print(np.array(X).shape)
+            bcp.append(BCP[cell_name][chr])
+        X.append(np.concatenate(bcp).tolist())
+    # print(len(X))输出749。X是一个列表，其中的每一个元素也是一个一维列表，一个一维列表存的是一个细胞的全部bcp特征。
+    # print(np.array(X).shape)  # 如果输出(748, 2660)，也就是说当前的idX集合共有748个细胞，每个细胞对应一个包含有2660个特征数据的列表。一个细胞就对应一行数据
     # print('BCP', X[:1])
+    # torch.from_numpy()方法把数组转换成张量
+    # 与torch.tensor()的区别：使用torch.from_numpy更加安全，使用tensor.Tensor在非float类型下会与预期不符。
     deal_dataset = TensorDataset(torch.from_numpy(np.array(X).astype(float)), torch.from_numpy(np.array(Y).astype(int)))
     return deal_dataset, np.array(X).shape[0]
-
+    # np.array(X).shape[0]返回的是当前当前的idX集合中细胞的个数
 def load_CDP_data(CDP,idX,Y):
     X = []
     for cell in idX:
         cell_name = cell[0]
-        value = CDP.loc[CDP['cell_nm'] == replace_linetodot(cell_name)].values[:, 1:].tolist()[0]
+        value = CDP.loc[CDP['cell_name'] == replace_linetodot(cell_name)+"_reads"].values[:, 1:].tolist()[0]
         X.append(value)
-    # print('CDD', X[:1])
+    # print('CDP', X[:1])
     deal_dataset = TensorDataset(torch.from_numpy(np.array(X).astype(float)), torch.from_numpy(np.array(Y).astype(int)))
     # print(deal_dataset[:1])
     return deal_dataset, np.array(X).shape[0]
@@ -79,8 +88,8 @@ def load_SBCP_data(SBCP, idX, Y):
             sbcp.append(SBCP[cell_name][chr])
         X.append(np.concatenate(sbcp).tolist())
     print(np.array(X).shape)
-    # print('SICP', X[:3])
-    # print('SICP',X)
+    # print('SBCP', X[:3])
+    # print('SBCP',X)
     deal_dataset = TensorDataset(torch.from_numpy(np.array(X).astype(float)), torch.from_numpy(np.array(Y).astype(int)))
     return deal_dataset, np.array(X).shape[0]
 
@@ -298,19 +307,18 @@ def load_loader(train_dataset,test_dataset,test_size):
                             shuffle=False)
     return train_loader, test_loader
 
-def CNN_1D_montage(BCP_train, CDP_train, SBCP_train,BCP_test_update5, CDP_test_update5, SBCP_test_update5, tr_x, tr_y, X_test, y_test, lr, model_para, alpha, gamma):
-    # device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+def CNN_1D_montage(BCP,CDP,SBCP, tr_x, tr_y, X_test, y_test, lr, model_para, alpha, gamma):
     fold = 'test'
     seed_torch()
-    train_dataset_BCP, train_size_BCP = load_BCP_data(BCP_train, tr_x, tr_y)
-    test_dataset_BCP, test_size_BCP = load_BCP_data(BCP_test_update5, X_test, y_test)
-    train_dataset_CDP, train_size_CDP = load_CDP_data(CDP_train, tr_x, tr_y)
-    test_dataset_CDP, test_size_CDP = load_CDP_data(CDP_test_update5, X_test, y_test)
-    train_dataset_SBCP, train_size_SBCP = load_SBCP_data(SBCP_train, tr_x, tr_y)
-    test_dataset_SBCP, test_size_SBCP = load_SBCP_data(SBCP_test_update5, X_test, y_test)
+    train_dataset_BCP, train_size_BCP = load_BCP_data(BCP, tr_x, tr_y)
+    test_dataset_BCP, test_size_BCP = load_BCP_data(BCP, X_test, y_test)
+    train_dataset_CDP, train_size_CDP = load_CDP_data(CDP, tr_x, tr_y)
+    test_dataset_CDP, test_size_CDP = load_CDP_data(CDP, X_test, y_test)
+    train_dataset_SBCP, train_size_SBCP = load_SBCP_data(SBCP, tr_x, tr_y)
+    test_dataset_SBCP, test_size_SBCP = load_SBCP_data(SBCP, X_test, y_test)
 
-    train_loader_BCP, test_loader_BCP = load_loader(train_dataset_BCP,test_dataset_BCP, test_size_BCP)
-    train_loader_CDP,  test_loader_CDP = load_loader(train_dataset_CDP, test_dataset_CDP, test_size_CDP)
+    train_loader_BCP, test_loader_BCP = load_loader(train_dataset_BCP, test_dataset_BCP, test_size_BCP)
+    train_loader_CDP, test_loader_CDP = load_loader(train_dataset_CDP, test_dataset_CDP, test_size_CDP)
     train_loader_SBCP, test_loader_SBCP = load_loader(train_dataset_SBCP, test_dataset_SBCP, test_size_SBCP)
     model = montage_model(model_para)
     device = try_gpu(3)
