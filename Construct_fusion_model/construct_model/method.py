@@ -31,18 +31,18 @@ def try_gpu(i=0):  #@save
     return torch.device('cpu')
 
 def load_BCP_dict():
-    file_path = "../../Data/BCP/Full_chr/Multi_channel/Nor/Bin_contact_strength(chr).npy"
+    file_path = "./Data/BCP_Nor.npy"
     Data = np.load(file_path, allow_pickle=True).item()
     return Data
 
 def load_CDP_dict():
-    CDP_file = "../../Data/CDD/CDD.txt"
+    CDP_file = "./Data/CDD.txt"
     Data = pd.read_table(CDP_file, sep='\t', header='infer', names=None, index_col=None, dtype=None, engine=None,
                          nrows=None)
     return Data
 
 def load_SBCP_dict():
-    file_path = '../../Data/SICP/Small_Domain_Struct_Contact_pro_scale(up_tran)(1).npy'
+    file_path = './Data/SICP.npy'
     Data = np.load(file_path, allow_pickle=True).item()
 
     return Data
@@ -56,30 +56,26 @@ def load_BCP_data(BCP, idX, Y):
     X = []
     for cell in idX:
         cell_name = replace_linetodot(cell[0]) + "_reads"
-        sbcp = []
+        bcp = []
         for chr in chr_list:
             # 不考虑Y染色体的接触信息
             if chr == "chrY":
                 continue
-            sbcp.append(BCP[cell_name][chr])
-        X.append(np.concatenate(sbcp).tolist())
+            bcp.append(BCP[cell_name][chr])
+        X.append(np.concatenate(bcp).tolist())
     # print(len(X))输出749。X是一个列表，其中的每一个元素也是一个一维列表，一个一维列表存的是一个细胞的全部bcp特征。
-    print(np.array(X).shape)  # 如果输出(748, 2660)，也就是说当前的idX集合共有748个细胞，每个细胞对应一个包含有2660个特征数据的列表。一个细胞就对应一行数据
+    # print(np.array(X).shape)  # 如果输出(748, 2660)，也就是说当前的idX集合共有748个细胞，每个细胞对应一个包含有2660个特征数据的列表。一个细胞就对应一行数据
     # print('BCP', X[:1])
     # torch.from_numpy()方法把数组转换成张量
     # 与torch.tensor()的区别：使用torch.from_numpy更加安全，使用tensor.Tensor在非float类型下会与预期不符。
     deal_dataset = TensorDataset(torch.from_numpy(np.array(X).astype(float)), torch.from_numpy(np.array(Y).astype(int)))
     return deal_dataset, np.array(X).shape[0]
     # np.array(X).shape[0]返回的是当前当前的idX集合中细胞的个数
-
-def load_CDP_data(CDP, idX, Y):
+def load_CDP_data(CDP,idX,Y):
     X = []
     for cell in idX:
         cell_name = cell[0]
-        value = CDP.loc[CDP['cell_nm'] == replace_linetodot(cell_name)].values[:, 1:].tolist()[0]
-        # 如果不在最后那个[0]的话value是
-        # [[0.0063179558030927, 0.0056127625585562, ..., 0.0018277457562478]]
-        # 加上以后就是[0.0063179558030927, 0.0056127625585562, ..., 0.0018277457562478]
+        value = CDP.loc[CDP['cell_name'] == replace_linetodot(cell_name)+"_reads"].values[:, 1:].tolist()[0]
         X.append(value)
     # print('CDP', X[:1])
     deal_dataset = TensorDataset(torch.from_numpy(np.array(X).astype(float)), torch.from_numpy(np.array(Y).astype(int)))
@@ -439,7 +435,7 @@ def CNN_1D_montage(BCP, CDP, SBCP, tr_x, tr_y, val_x, val_y, lr, fold, model_par
     min_loss = 100000.0
     optimizer = Adam(model.parameters(), lr=lr)
     loss_fn = MultiClassFocalLossWithAlpha(alpha=alpha, gamma=gamma)
-    path = "../model/model_construct_lr=000001/Cross%s/" % fold
+    path = "./Construct_fusion_model/model/model_construct/Cross%s/" % fold
     for epoch in range(num_epochs):
         model.train()
         model, optimizer = CNN_train(epoch, model, optimizer, train_loader, loss_fn,device)
