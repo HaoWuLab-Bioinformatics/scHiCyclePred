@@ -10,10 +10,8 @@ from pytorch_tools import EarlyStopping
 
 from torch.optim import Adam
 
-
-
 def load_SICP_dict():
-    file_path = '../../Data/SICP/Small_Domain_Struct_Contact_pro_scale(up_tran)(1).npy'
+    file_path = './Data/SICP.npy'
     Data = np.load(file_path, allow_pickle=True).item()
 
     return Data
@@ -25,13 +23,15 @@ def load_SICP_data(SICP, idX, Y):
     X = []
     for cell in idX:
         cell_name = replace_linetodot(cell[0]) + "_reads"
-        SICP = []
+        sbcp = []
         for chr in chr_list:
             if chr == "chrY":
                 continue
-            SICP.append(SICP[cell_name][chr])
-        X.append(np.concatenate(SICP).tolist())
+            sbcp.append(SICP[cell_name][chr])
+        X.append(np.concatenate(sbcp).tolist())
     print(np.array(X).shape)
+    # print('SICP', X[:3])
+    # print('SICP',X)
     deal_dataset = TensorDataset(torch.from_numpy(np.array(X).astype(float)), torch.from_numpy(np.array(Y).astype(int)))
     return deal_dataset, np.array(X).shape[0]
 
