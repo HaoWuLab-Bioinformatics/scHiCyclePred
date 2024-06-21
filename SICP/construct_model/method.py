@@ -10,19 +10,8 @@ from pytorch_tools import EarlyStopping
 
 from torch.optim import Adam
 
-def load_BCP_dict():
-    file_path = "../../Data/BCP/Full_chr/Multi_channel/Nor/Bin_contact_strength(chr).npy"
-    Data = np.load(file_path, allow_pickle=True).item()
-    return Data
-
-def load_CDP_dict():
-    CDP_file = "../../Data/CDD/CDD.txt"
-    Data = pd.read_table(CDP_file, sep='\t', header='infer', names=None, index_col=None, dtype=None, engine=None,
-                         nrows=None)
-    return Data
-
 def load_SICP_dict():
-    file_path = '../../Data/SICP/Small_Domain_Struct_Contact_pro_scale(up_tran)(1).npy'
+    file_path = './Data/SICP.npy'
     Data = np.load(file_path, allow_pickle=True).item()
 
     return Data
@@ -34,13 +23,15 @@ def load_SICP_data(SICP, idX, Y):
     X = []
     for cell in idX:
         cell_name = replace_linetodot(cell[0]) + "_reads"
-        SICP = []
+        sbcp = []
         for chr in chr_list:
             if chr == "chrY":
                 continue
-            SICP.append(SICP[cell_name][chr])
-        X.append(np.concatenate(SICP).tolist())
+            sbcp.append(SICP[cell_name][chr])
+        X.append(np.concatenate(sbcp).tolist())
     print(np.array(X).shape)
+    # print('SICP', X[:3])
+    # print('SICP',X)
     deal_dataset = TensorDataset(torch.from_numpy(np.array(X).astype(float)), torch.from_numpy(np.array(Y).astype(int)))
     return deal_dataset, np.array(X).shape[0]
 
@@ -167,7 +158,7 @@ def CNN_1D_montage(SICP, tr_x, tr_y, val_x, val_y, lr, fold,model_para):
     min_loss = 100000.0
     optimizer = Adam(model.parameters(), lr=lr)
     loss_fn = nn.CrossEntropyLoss()
-    path = "./model/model_construct/Cross%s/" % fold
+    path = "./SICP/model/model_construct/Cross%s/" % fold
     for epoch in range(num_epochs):
         model.train()
         model, optimizer, train_loader = CNN_train(epoch, model, optimizer, train_loader, loss_fn)
