@@ -88,4 +88,18 @@ python .\Feature_sets_extraction\Nor_BCP.py
 
 ## Computational resources and runtime
 
-Our entire method is implemented on an NVIDIA A800 GPU. We have tested the computational resources utilized by our algorithm when processing Hi-C data from 6288 cells. It required at least 8GB of memory and 12GB of GPU memory, with a minimum runtime of 15 hours.
+Our entire method is implemented on an NVIDIA A800 GPU:
+
+For Nagano_dataset:
+| computational resources |
+| ------------- |
+(1) Memory Usage: 6GB of RAM.
+(2) GPU Memory Usage: 10GB.
+(3) Runtime: 15 hours.
+
+For Liu_dataset, it required at least 10GB of memory and 12GB of GPU memory, with a minimum runtime of 15 hours.
+| computational resources |
+| ------------- |
+(1) Memory Usage: 8GB of RAM.
+(2) GPU Memory Usage: 15GB.
+(3) Runtime: 22 hours.
