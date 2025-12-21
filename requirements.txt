@@ -79,7 +79,7 @@ pyzmq==24.0.1
 qtconsole==5.5.1
 QtPy==2.4.1
 referencing==0.34.0
-requests==2.25.1
+requests==2.31.0
 rfc3339-validator==0.1.4
 rfc3986-validator==0.1.1
 rpds-py==0.18.0
@@ -109,3 +109,4 @@ XlsxWriter==3.2.0
 openpyxl==3.1.4
 xlrd==2.0.1
 zipp==3.18.1
+
