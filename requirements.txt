@@ -6,7 +6,7 @@ asttokens==2.4.1
 attrs==23.2.0
 beautifulsoup4==4.12.3
 bleach==6.1.0
-certifi==2024.2.2
+certifi==2024.7.4
 cffi==1.16.0
 chardet==4.0.0
 colorama==0.4.6
@@ -79,7 +79,7 @@ pyzmq==24.0.1
 qtconsole==5.5.1
 QtPy==2.4.1
 referencing==0.34.0
-requests==2.32.0
+requests==2.32.4
 rfc3339-validator==0.1.4
 rfc3986-validator==0.1.1
 rpds-py==0.18.0
@@ -109,6 +109,7 @@ XlsxWriter==3.2.0
 openpyxl==3.1.4
 xlrd==2.0.1
 zipp==3.19.1
+
 
 
 
